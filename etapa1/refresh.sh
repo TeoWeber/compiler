@@ -2,4 +2,4 @@
 
 make clean
 make
-./etapa1
+./etapa1 in.txt
