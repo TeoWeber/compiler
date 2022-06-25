@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "tokens.h"
-#include "utils.h"
+#include "lib/include/tools.h"
 
 extern int yylex(void);
 extern int yylex_destroy(void);

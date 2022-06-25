@@ -8,20 +8,20 @@
 # Use make clean to remove old files before remaking everything
 #
 
-etapa1: lex.yy.o main.o utils.o
-	gcc -o etapa1 utils.o lex.yy.o main.o -ll
+etapa1: lex.yy.o main.o tools.o
+	gcc -o etapa1 obj/tools.o obj/lex.yy.o obj/main.o -ll
 
 main.o: main.c
-	gcc -c main.c
+	gcc -c main.c -o obj/main.o
 
 lex.yy.o: lex.yy.c
-	gcc -c lex.yy.c
+	gcc -c lex.yy.c -o obj/lex.yy.o
 
 lex.yy.c: scanner.l
 	lex --header-file=lex.yy.h scanner.l
 
-utils.o: utils.c
-	gcc -c utils.c
+tools.o: lib/tools.c
+	gcc -c lib/tools.c -o obj/tools.o
 	
 clean:
-	rm *.o lex.yy.h lex.yy.c etapa1
+	rm obj/*.o lex.yy.h lex.yy.c etapa1

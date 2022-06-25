@@ -1,6 +1,6 @@
 %{
     #include "tokens.h"
-    #include "utils.h"
+    #include "lib/include/tools.h"
 %}
 
 %x COMMENT
