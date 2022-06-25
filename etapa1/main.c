@@ -1,6 +1,11 @@
+// main.c - Compiladores 2022/1
+// Astélio José Weber Júnior - 283864
+// Wellington Nascente Hirsch - 287715
+
 #include <stdlib.h>
-#include "tokens.h"
+#include "lib/include/hash.h"
 #include "lib/include/tools.h"
+#include "lib/include/tokens.h"
 
 extern int yylex(void);
 extern int yylex_destroy(void);
@@ -11,19 +16,19 @@ extern char *yytext;
 int main (int argc, char **argv) {
     int tok;
 
-    if(argc < 2){
+    if(argc < 2) {
         fprintf(stderr, "Call: etapa input_file_name\n");
         exit(1);
     }
 
-    if((yyin = fopen(argv[1], "r")) == 0 ){
+    if((yyin = fopen(argv[1], "r")) == 0 ) {
         fprintf(stderr, "File %s not found!\n", argv[1]);
         exit(2);
     }
 
     initMe();
 
-    while(isRunning()){
+    while(isRunning()) {
         tok = yylex();
         if(isRunning() == 0)
             break;
@@ -109,6 +114,7 @@ int main (int argc, char **argv) {
         }
     }
 
+    hashPrint();
     yylex_destroy();
     exit(0);
 }

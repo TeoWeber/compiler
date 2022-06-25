@@ -1,6 +1,11 @@
 %{
-    #include "tokens.h"
+    // scanner.l - Compiladores 2022/1
+    // Astélio José Weber Júnior - 283864
+    // Wellington Nascente Hirsch - 287715
+
     #include "lib/include/tools.h"
+    #include "lib/include/hash.h"
+    #include "lib/include/tokens.h"
 %}
 
 %x COMMENT
@@ -25,12 +30,12 @@ return                      { return KW_RETURN; }
 "=="                        { return OPERATOR_EQ; }
 "!="                        { return OPERATOR_DIF; }
 
-[a-zA-Z_]+                  { return TK_IDENTIFIER; }   // hash_insert(TK_IDENTIFIER, yytext);
+[a-zA-Z_]+                  { hashInsert(TK_IDENTIFIER, yytext); return TK_IDENTIFIER; }
 
-[0-9]+                      { return LIT_INTEGER; }     // hash_insert(LIT_INTEGER, yytext);
-[0-9]+,[0-9]+               { return LIT_FLOAT; }       // hash_insert(LIT_FLOAT, yytext);
-\'([^"\\]|\\.)?\'           { return LIT_CHAR; }        // hash_insert(LIT_CHAR, yytext);
-\"([^"\\]|\\.)*\"           { return LIT_STRING; }      // hash_insert(LIT_STRING, yytext);
+[0-9]+                      { hashInsert(LIT_INTEGER, yytext); return LIT_INTEGER; }
+[0-9]+,[0-9]+               { hashInsert(LIT_FLOAT, yytext); return LIT_FLOAT; }
+\'([^"\\]|\\.)?\'           { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
+\"([^"\\]|\\.)*\"           { hashInsert(LIT_STRING, yytext); return LIT_STRING; }
 
 [;\(\)\[\]{}\+\-\*./<>&|~]  { return yytext[0]; }
 
