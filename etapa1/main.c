@@ -102,7 +102,7 @@ int main (int argc, char **argv) {
             case '&':
             case '|':
             case '~':
-                fprintf(stderr, "Special Character: %c at line %d\n", tok, getLineNumber());
+                fprintf(stderr, "Special Character: \'%c\' at line %d\n", tok, getLineNumber());
                 break;
             default:
                 fprintf(stderr, "ERROR: invalid token at line %d!\n", getLineNumber());
