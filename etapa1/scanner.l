@@ -3,9 +3,9 @@
     // Astélio José Weber Júnior - 283864
     // Wellington Nascente Hirsch - 287715
 
-    #include "lib/include/tools.h"
-    #include "lib/include/hash.h"
-    #include "lib/include/tokens.h"
+    #include "tools.h"
+    #include "hash.h"
+    #include "tokens.h"
 %}
 
 %x COMMENT
@@ -55,7 +55,7 @@ return                      { return KW_RETURN; }
 
 int yywrap()
 {
-    fprintf(stderr, "Number of lines in the document: %d\n", lineNumber);
+    fprintf(stderr, "Number of lines in the document: %d\n\n\n", lineNumber);
     running = 0;
     return 1;
 }

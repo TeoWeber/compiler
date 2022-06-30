@@ -1,11 +1,15 @@
-#ifndef HASH_HEADER
-#define HASH_HEADER
+// hash.h - Compiladores 2022/1
+// Astélio José Weber Júnior - 283864
+// Wellington Nascente Hirsch - 287715
+
+#ifndef HASH_H
+#define HASH_H
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#define HASH_SIZE 1009
+#define HASH_SIZE 997
 
 typedef struct hash_node
 {

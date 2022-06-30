@@ -1,4 +1,4 @@
-# Makefile - Compiladores 2022/1
+# makefile - Compiladores 2022/1
 # Astélio José Weber Júnior - 283864
 # Wellington Nascente Hirsch - 287715
 
@@ -14,14 +14,15 @@ lex.yy.o: lex.yy.c obj/
 lex.yy.c: scanner.l
 	lex --header-file=lex.yy.h scanner.l
 
-tools.o: lib/tools.c obj/
-	gcc -c lib/tools.c -o obj/tools.o
+tools.o: tools.c obj/
+	gcc -c tools.c -o obj/tools.o
 
-hash.o: lib/hash.c obj/
-	gcc -c lib/hash.c -o obj/hash.o
+hash.o: hash.c obj/
+	gcc -c hash.c -o obj/hash.o
 
 obj/:
 	mkdir obj
-	
+
+
 clean:
 	rm -rf obj/ lex.yy.h lex.yy.c etapa1

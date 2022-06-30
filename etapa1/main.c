@@ -2,16 +2,23 @@
 // Astélio José Weber Júnior - 283864
 // Wellington Nascente Hirsch - 287715
 
+#include <stdio.h>
 #include <stdlib.h>
-#include "lib/include/hash.h"
-#include "lib/include/tools.h"
-#include "lib/include/tokens.h"
+#include "tokens.h"
 
 extern int yylex(void);
 extern int yylex_destroy(void);
 
 extern FILE *yyin;
 extern char *yytext;
+
+// TOOLS Functions
+int getLineNumber(void);
+int isRunning(void);
+void initMe(void);
+
+// HASH Functions
+void hashPrint(void);
 
 int main (int argc, char **argv) {
     int tok;

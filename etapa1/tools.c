@@ -2,20 +2,17 @@
 // Astélio José Weber Júnior - 283864
 // Wellington Nascente Hirsch - 287715
 
-#include "include/tools.h"
+#include "tools.h"
 
-int getLineNumber(void)
-{
+int getLineNumber(void) {
   return lineNumber;
 }
 
-int isRunning(void)
-{
+int isRunning(void) {
   return running;
 }
 
-void initMe(void)
-{
+void initMe(void) {
   running = 1;
   lineNumber = 1;
 
