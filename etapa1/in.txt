@@ -1,0 +1,47 @@
+## RESERVED WORDS
+char
+int   
+float 
+if    
+else  
+while 
+read  
+print 
+return
+
+## SPECIAL CHARACTERS
+;()[]{}+-./<>&|~
+
+## IDENTIFIERS:
+teste_um
+testeDois
+
+## OPERATORS
+<-
+<=
+>=
+==
+!=
+
+## LITERAL INTEGERS
+132213
+3340
+0000
+
+## LITERAL FLOAT
+2332,41
+1,1
+000,000
+
+## LITERAL CHAR
+'a'
+'\''
+''
+
+## LITERAL STRING
+"string"
+"string\"""strings consecutivas"
+""
+
+## teste
+\# teste #\
