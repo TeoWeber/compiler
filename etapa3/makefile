@@ -2,10 +2,12 @@
 # Astélio José Weber Júnior - 283864
 # Wellington Nascente Hirsch - 287715
 
-run: etapa1
-	./etapa1 in.txt
+run: etapa3
+	./etapa3 source.txt eq1.txt
+	./etapa3 eq1.txt eq2.txt
+	diff eq1.txt eq2.txt
 
-etapa1: lex.yy.o main.o tools.o hash.o
+etapa3: lex.yy.o main.o tools.o hash.o
 	gcc -o etapa1 obj/hash.o obj/tools.o obj/lex.yy.o obj/main.o -ll
 
 main.o: main.c obj/
