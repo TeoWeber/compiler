@@ -5,7 +5,7 @@
 
     #include "tools.h"
     #include "hash.h"
-    #include "tokens.h"
+    #include "y.tab.h"
 %}
 
 %x COMMENT
@@ -30,14 +30,14 @@ return                      { return KW_RETURN; }
 "=="                        { return OPERATOR_EQ; }
 "!="                        { return OPERATOR_DIF; }
 
-[a-zA-Z_]+                  { hashInsert(TK_IDENTIFIER, yytext); return TK_IDENTIFIER; }
+[a-zA-Z_]+                  { hashInsert(SYMBOL_IDENTIFIER, yytext); return TK_IDENTIFIER; }
 
-[0-9]+                      { hashInsert(LIT_INTEGER, yytext); return LIT_INTEGER; }
-[0-9]+,[0-9]+               { hashInsert(LIT_FLOAT, yytext); return LIT_FLOAT; }
-\'([^"\\]|\\.)?\'           { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
-\"([^"\\]|\\.)*\"           { hashInsert(LIT_STRING, yytext); return LIT_STRING; }
+[0-9]+                      { hashInsert(SYMBOL_LIT_INT, yytext); return LIT_INTEGER; }
+[0-9]+,[0-9]+               { hashInsert(SYMBOL_LIT_FLOAT, yytext); return LIT_FLOAT; }
+\'([^"\\]|\\.)?\'           { hashInsert(SYMBOL_LIT_CHAR, yytext); return LIT_CHAR; }
+\"([^"\\]|\\.)*\"           { hashInsert(SYMBOL_LIT_STRING, yytext); return LIT_STRING; }
 
-[;\(\)\[\]{}\+\-./<>&|~]  { return yytext[0]; }
+[;\(\)\[\]{}\+\-./<>&|~]    { return yytext[0]; }
 
 [ \t]
 [\n]                        { ++ lineNumber; }
@@ -55,7 +55,6 @@ return                      { return KW_RETURN; }
 
 int yywrap()
 {
-    fprintf(stderr, "Number of lines in the document: %d\n\n\n", lineNumber);
     running = 0;
     return 1;
 }
