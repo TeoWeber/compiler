@@ -1,5 +1,5 @@
 #!/bin/bash
 
 make
-./etapa1 in.txt
+./etapa2 in.txt
 make clean
