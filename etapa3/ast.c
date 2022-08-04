@@ -1,4 +1,6 @@
-// AST - Abstract Syntax Tree
+// ast.c - Compiladores 2022/1
+// Astélio José Weber Júnior - 283864
+// Wellington Nascente Hirsch - 287715
 
 #include "ast.h"
   
