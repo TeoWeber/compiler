@@ -5,6 +5,7 @@
 
     #include "tools.h"
     #include "hash.h"
+    #include "ast.h"
     #include "y.tab.h"
 %}
 
@@ -30,12 +31,12 @@ return                      { return KW_RETURN; }
 "=="                        { return OPERATOR_EQ; }
 "!="                        { return OPERATOR_DIF; }
 
-[a-zA-Z_]+                  { hashInsert(SYMBOL_IDENTIFIER, yytext); return TK_IDENTIFIER; }
+[a-zA-Z_]+                  { yylval.symbol = hashInsert(SYMBOL_IDENTIFIER, yytext); return TK_IDENTIFIER; }
 
-[0-9]+                      { hashInsert(SYMBOL_LIT_INT, yytext); return LIT_INTEGER; }
-[0-9]+,[0-9]+               { hashInsert(SYMBOL_LIT_FLOAT, yytext); return LIT_FLOAT; }
-\'([^"\\]|\\.)?\'           { hashInsert(SYMBOL_LIT_CHAR, yytext); return LIT_CHAR; }
-\"([^"\\]|\\.)*\"           { hashInsert(SYMBOL_LIT_STRING, yytext); return LIT_STRING; }
+[0-9]+                      { yylval.symbol = hashInsert(SYMBOL_LIT_INT, yytext); return LIT_INTEGER; }
+[0-9]+,[0-9]+               { yylval.symbol = hashInsert(SYMBOL_LIT_FLOAT, yytext); return LIT_FLOAT; }
+\'([^"\\]|\\.)?\'           { yylval.symbol = hashInsert(SYMBOL_LIT_CHAR, yytext); return LIT_CHAR; }
+\"([^"\\]|\\.)*\"           { yylval.symbol = hashInsert(SYMBOL_LIT_STRING, yytext); return LIT_STRING; }
 
 [;\(\)\[\]{}\+\-./<>&|~]    { return yytext[0]; }
 

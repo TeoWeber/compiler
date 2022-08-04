@@ -2,6 +2,22 @@
 // Astélio José Weber Júnior - 283864
 // Wellington Nascente Hirsch - 287715
 
+%{
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include "ast.h"
+
+    int yylex();
+    int yyerror();
+    extern int getLineNumber(void);
+%}
+
+%union
+{
+    HASH_NODE *symbol;
+    AST *ast;
+}
+
 %token KW_CHAR      
 %token KW_INT       
 %token KW_FLOAT     
@@ -19,14 +35,36 @@
 %token OPERATOR_EQ
 %token OPERATOR_DIF
 
-%token TK_IDENTIFIER
+%token<symbol> TK_IDENTIFIER
 
-%token LIT_INTEGER  
-%token LIT_FLOAT    
-%token LIT_CHAR     
-%token LIT_STRING   
+%token<symbol> LIT_INTEGER  
+%token<symbol> LIT_FLOAT    
+%token<symbol> LIT_CHAR     
+%token<symbol> LIT_STRING   
 
 %token TOKEN_ERROR  
+
+%type<ast> program
+%type<ast> decl
+%type<ast> varDecl
+%type<ast> type
+%type<ast> index
+%type<ast> literal
+%type<ast> vecInitValue
+%type<ast> funcDecl
+%type<ast> paramList
+%type<ast> cmdBlock
+%type<ast> cmdList
+%type<ast> cmd
+%type<ast> attrib
+%type<ast> read
+%type<ast> print
+%type<ast> printList
+%type<ast> return
+%type<ast> expr
+%type<ast> funcCall
+%type<ast> argList
+%type<ast> flow
 
 %left '|' '&'
 %left '<' '>' OPERATOR_EQ OPERATOR_LE OPERATOR_GE OPERATOR_DIF
@@ -37,119 +75,111 @@
 %right "flow" KW_ELSE
 %right "identifier" '('
 
-%{
-    #include <stdio.h>
-    #include <stdlib.h>
-
-    int yylex();
-    int yyerror();
-    extern int getLineNumber(void);
-%}
 
 %%
 
 
-program: decl
+program: decl                                                   { astPrint($1, 0);  astCompiled = $1; }
     ;
 
-decl: varDecl decl
-    | funcDecl decl
-    |
+decl: varDecl decl                                              { $$ = astCreate(AST_VAR, 0, $1, $2, 0, 0); }
+    | funcDecl decl                                             { $$ = astCreate(AST_FUNC, 0, $1, $2, 0, 0); }
+    |                                                           { $$ = 0; }
     ;
 
-varDecl: type TK_IDENTIFIER '(' literal ')' ';'
-    | type TK_IDENTIFIER '[' LIT_INTEGER ']' vecInitValue ';'
+varDecl: type TK_IDENTIFIER '(' literal ')' ';'                 { $$ = astCreate(AST_VARDECL, $2, $1, $4, 0, 0); }
+    | type TK_IDENTIFIER '[' index ']' vecInitValue ';'         { $$ = astCreate(AST_VECDECL, $2, $1, $4, $6, 0); }
     ;
 
-type: KW_INT
-    | KW_FLOAT
-    | KW_CHAR
+type: KW_INT                                                    { $$ = astCreate(AST_KWINT, 0, 0, 0, 0, 0); }
+    | KW_FLOAT                                                  { $$ = astCreate(AST_KWFLOAT, 0, 0, 0, 0, 0); }
+    | KW_CHAR                                                   { $$ = astCreate(AST_KWCHAR, 0, 0, 0, 0, 0); }
     ;
 
-literal: LIT_INTEGER
-    | LIT_FLOAT
-    | LIT_CHAR
+index: LIT_INTEGER                                              { $$ = astCreate(AST_INDEX, $1, 0, 0, 0, 0); }
     ;
 
-vecInitValue: literal vecInitValue
-    |
+literal: LIT_INTEGER                                            { $$ = astCreate(AST_LITERAL, $1, 0, 0, 0, 0); }
+    | LIT_FLOAT                                                 { $$ = astCreate(AST_LITERAL, $1, 0, 0, 0, 0); }
+    | LIT_CHAR                                                  { $$ = astCreate(AST_LITERAL, $1, 0, 0, 0, 0); }
     ;
 
-funcDecl: header cmdBlock
+vecInitValue: literal vecInitValue                              { $$ = astCreate(AST_VECVALUE, 0, $1, $2, 0, 0); }
+    |                                                           { $$ = 0; }
     ;
 
-header: type TK_IDENTIFIER '(' paramList ')'
+funcDecl: type TK_IDENTIFIER '(' paramList ')' cmdBlock         { $$ = astCreate(AST_FUNCDECL, $2, $1, $4, $6, 0); }
     ;
 
-paramList: type TK_IDENTIFIER paramList
-    |
+paramList: type TK_IDENTIFIER paramList                         { $$ = astCreate(AST_PARAM, $2, $1, $3, 0, 0); }
+    |                                                           { $$ = 0; }
     ;
 
-cmdBlock: '{' cmdList '}'
+cmdBlock: '{' cmdList '}'                                       { $$ = astCreate(AST_CMDBLOCK, 0, $2, 0, 0, 0); }
     ;
 
-cmdList: cmd ';' cmdList
-    | cmd
+cmdList: cmd ';' cmdList                                        { $$ = astCreate(AST_CMDLIST, 0, $1, $3, 0, 0); }
+    | cmd                                                       { $$ = astCreate(AST_CMD, 0, $1, 0, 0, 0); }
     ;
 
-cmd: read
-    | print
-    | return
-    | attrib
-    | flow
-    | cmdBlock
-    |
+cmd: read                                                       { $$ = $1; }
+    | print                                                     { $$ = $1; }
+    | return                                                    { $$ = $1; }
+    | attrib                                                    { $$ = $1; }
+    | flow                                                      { $$ = $1; }
+    | cmdBlock                                                  { $$ = $1; }
+    |                                                           { $$ = 0; }
     ;
 
-attrib: TK_IDENTIFIER ASSIGNMENT expr
-    | TK_IDENTIFIER '[' expr ']' ASSIGNMENT expr
+attrib: TK_IDENTIFIER ASSIGNMENT expr                           { $$ = astCreate(AST_ATTRIB, $1, $3, 0, 0, 0); }
+    | TK_IDENTIFIER '[' expr ']' ASSIGNMENT expr                { $$ = astCreate(AST_ATTRIBVEC, $1, $3, $6, 0, 0); }
     ;
 
-read: KW_READ TK_IDENTIFIER
-    | KW_READ TK_IDENTIFIER '[' expr ']'
+read: KW_READ TK_IDENTIFIER                                     { $$ = astCreate(AST_READ, $2, 0, 0, 0, 0); }
+    | KW_READ TK_IDENTIFIER '[' expr ']'                        { $$ = astCreate(AST_READVEC, $2, $4, 0, 0, 0); }
     ;
 
-print: KW_PRINT printList
+print: KW_PRINT printList                                       { $$ = astCreate(AST_PRINT, 0, $2, 0, 0, 0); }
     ;
 
-printList: LIT_STRING printList
-    | expr printList
-    |
+printList: LIT_STRING printList                                 { $$ = astCreate(AST_PRINTSTRING, $1, $2, 0, 0, 0); }
+    | expr printList                                            { $$ = astCreate(AST_PRINTEXPR, 0, $1, $2, 0, 0); }
+    |                                                           { $$ = 0; }
     ;
 
-return: KW_RETURN expr
+return: KW_RETURN expr                                          { $$ = astCreate(AST_RETURN, 0, $2, 0, 0, 0); }
     ;
 
-expr: TK_IDENTIFIER                         %prec "identifier"
-    | TK_IDENTIFIER '[' expr ']'
-    | literal
-    | '(' expr ')'
-    | expr '+' expr
-    | expr '-' expr
-    | expr '.' expr
-    | expr '/' expr
-    | expr '<' expr
-    | expr '>' expr
-    | expr OPERATOR_LE expr
-    | expr OPERATOR_GE expr
-    | expr OPERATOR_EQ expr
-    | expr OPERATOR_DIF expr
-    | expr '&' expr
-    | expr '|' expr
-    | '~' expr
-    | funcCall
+expr: TK_IDENTIFIER                         %prec "identifier"  { $$ = astCreate(AST_IDVAR, $1, 0, 0, 0, 0); }
+    | TK_IDENTIFIER '[' expr ']'                                { $$ = astCreate(AST_IDVEC, $1, $3, 0, 0, 0); }
+    | literal                                                   { $$ = $1; }
+    | '(' expr ')'                                              { $$ = $2; }
+    | expr '+' expr                                             { $$ = astCreate(AST_ADD, 0, $1, $3, 0, 0); }
+    | expr '-' expr                                             { $$ = astCreate(AST_SUB, 0, $1, $3, 0, 0); }
+    | expr '.' expr                                             { $$ = astCreate(AST_MUL, 0, $1, $3, 0, 0); }
+    | expr '/' expr                                             { $$ = astCreate(AST_DIV, 0, $1, $3, 0, 0); }
+    | expr '<' expr                                             { $$ = astCreate(AST_LT, 0, $1, $3, 0, 0); }
+    | expr '>' expr                                             { $$ = astCreate(AST_GT, 0, $1, $3, 0, 0); }
+    | expr OPERATOR_LE expr                                     { $$ = astCreate(AST_LE, 0, $1, $3, 0, 0); }
+    | expr OPERATOR_GE expr                                     { $$ = astCreate(AST_GE, 0, $1, $3, 0, 0); }
+    | expr OPERATOR_EQ expr                                     { $$ = astCreate(AST_EQ, 0, $1, $3, 0, 0); }
+    | expr OPERATOR_DIF expr                                    { $$ = astCreate(AST_DIF, 0, $1, $3, 0, 0); }
+    | expr '&' expr                                             { $$ = astCreate(AST_AND, 0, $1, $3, 0, 0); }
+    | expr '|' expr                                             { $$ = astCreate(AST_OR, 0, $1, $3, 0, 0); }
+    | '~' expr                                                  { $$ = astCreate(AST_NEG, 0, $2, 0, 0, 0); }
+    | funcCall                                                  { $$ = $1; }
     ;
 
-funcCall: TK_IDENTIFIER '(' argList ')'
+funcCall: TK_IDENTIFIER '(' argList ')'                         { $$ = astCreate(AST_FUNCCALL, $1, $3, 0, 0, 0); }
     ;
 
-argList: expr argList
-    |
+argList: expr argList                                           { $$ = astCreate(AST_ARGLIST, 0, $1, $2, 0, 0); }
+    |                                                           { $$ = 0; }
     ;
 
-flow: KW_IF '(' expr ')' cmd                %prec "flow"
-    | KW_IF '(' expr ')' cmd KW_ELSE cmd
-    | KW_WHILE '(' expr ')' cmd
+flow: KW_IF '(' expr ')' cmd                %prec "flow"        { $$ = astCreate(AST_IF, 0, $3, $5, 0, 0); }
+    | KW_IF '(' expr ')' cmd KW_ELSE cmd                        { $$ = astCreate(AST_IFELSE, 0, $3, $5, $7, 0); }
+    | KW_WHILE '(' expr ')' cmd                                 { $$ = astCreate(AST_WHILE, 0, $3, $5, 0, 0); }
     ;
 
 

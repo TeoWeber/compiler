@@ -7,8 +7,8 @@ run: etapa3
 	./etapa3 eq1.txt eq2.txt
 	diff eq1.txt eq2.txt
 
-etapa3: lex.yy.o main.o tools.o hash.o
-	gcc -o etapa1 obj/hash.o obj/tools.o obj/lex.yy.o obj/main.o -ll
+etapa3: y.tab.o lex.yy.o main.o tools.o hash.o ast.o
+	gcc -o etapa3 obj/ast.o obj/hash.o obj/tools.o obj/y.tab.o obj/lex.yy.o obj/main.o -ll
 
 main.o: main.c obj/
 	gcc -c main.c -o obj/main.o
@@ -19,8 +19,17 @@ lex.yy.o: lex.yy.c obj/
 lex.yy.c: scanner.l
 	lex --header-file=lex.yy.h scanner.l
 
+y.tab.o: y.tab.c obj/
+	gcc -c y.tab.c -o obj/y.tab.o
+
+y.tab.c: parser.y
+	yacc parser.y -d
+
 tools.o: tools.c obj/
 	gcc -c tools.c -o obj/tools.o
+
+ast.o: ast.c obj/
+	gcc -c ast.c -o obj/ast.o
 
 hash.o: hash.c obj/
 	gcc -c hash.c -o obj/hash.o
@@ -28,5 +37,6 @@ hash.o: hash.c obj/
 obj/:
 	mkdir obj
 
+
 clean:
-	rm -rf obj/ lex.yy.h lex.yy.c etapa1
+	rm -rf obj/ y.tab.h y.tab.c lex.yy.h lex.yy.c eq1.txt eq2.txt etapa3

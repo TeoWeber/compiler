@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "lex.yy.h"
+#include "ast.h"
 
 extern int yylex(void);
 extern int yylex_destroy(void);
@@ -24,6 +25,7 @@ void hashPrint(void);
 
 int main (int argc, char **argv) {
     int tok;
+    FILE *file;
 
     if(argc < 2) {
         fprintf(stderr, "Call: etapa input_file_name\n");
@@ -36,10 +38,15 @@ int main (int argc, char **argv) {
     }
 
     initMe();
-
     yyparse();
-
     hashPrint();
+
+    if (argc >= 3)
+    {
+        file = fopen( argv[2], "w" );
+        astDecompiler(file, astCompiled);
+        fclose(file);
+    }
 
     fclose(yyin);
     yylex_destroy();
