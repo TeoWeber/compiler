@@ -2,6 +2,9 @@
 # Astélio José Weber Júnior - 283864
 # Wellington Nascente Hirsch - 287715
 
+run: etapa1
+	./etapa1 in.txt
+
 etapa1: lex.yy.o main.o tools.o hash.o
 	gcc -o etapa1 obj/hash.o obj/tools.o obj/lex.yy.o obj/main.o -ll
 
@@ -22,7 +25,6 @@ hash.o: hash.c obj/
 
 obj/:
 	mkdir obj
-
 
 clean:
 	rm -rf obj/ lex.yy.h lex.yy.c etapa1

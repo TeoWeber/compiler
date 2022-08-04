@@ -1,0 +1,7 @@
+
+*.o
+etapa1/lex.yy.h
+etapa1/lex.yy.c
+etapa1/etapa1
+etapa3/lex.yy.h
+etapa3/lex.yy.c
