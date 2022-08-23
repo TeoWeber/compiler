@@ -50,7 +50,7 @@ int main ()
     print "OK!\n"; {{}}
   }
 
-int incn (int x int n )
+int incn (int x int n int d)
   {
   return x + n
   }

@@ -132,11 +132,13 @@ void evaluateVarDeclared(AST* node) {
 
 void evaluateParamDeclared(AST *node) {
   AST *typeNode;
+  AST *paramTail;
 
   if (!node)
     return;
 
   typeNode = node->son[0];
+  paramTail = node->son[1];
   
   if(node->symbol->type != SYMBOL_IDENTIFIER) { // Already declared!
     fprintf(stderr, "Semantic ERROR: Parameter \"%s\" already declared!\n", node->symbol->text);
@@ -145,6 +147,8 @@ void evaluateParamDeclared(AST *node) {
 
   node->symbol->type = SYMBOL_PARAM;
   node->symbol->dataType = getDataType(typeNode);
+
+  evaluateParamDeclared(paramTail);
 }
 
 void evaluateFuncDeclared(AST *node) {

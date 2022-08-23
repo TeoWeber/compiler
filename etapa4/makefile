@@ -40,4 +40,4 @@ obj/:
 
 
 clean:
-	rm -rf obj/ y.tab.h y.tab.c lex.yy.h lex.yy.c eq1.txt eq2.txt etapa3
+	rm -rf obj/ y.tab.h y.tab.c lex.yy.h lex.yy.c eq1.txt eq2.txt etapa4
