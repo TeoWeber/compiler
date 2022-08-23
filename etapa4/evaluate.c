@@ -6,6 +6,47 @@
 
 int errors = 0;
 
+int isTypeCompatible (int varType, int dataType) {
+  if (!varType || !dataType)
+    return 0;
+
+  switch(varType)
+  {
+    case DATA_TYPE_INT: // Compatible with integer
+      if(dataType == DATA_TYPE_FLOAT || dataType == DATA_TYPE_BOOL)
+        return 0;
+      break;
+    case DATA_TYPE_FLOAT: // Incompatible with anything
+      if(dataType == DATA_TYPE_INT || dataType == DATA_TYPE_CHAR || dataType == DATA_TYPE_BOOL)
+        return 0;
+      break;
+    case DATA_TYPE_CHAR: // Compatible with char
+      if(dataType == DATA_TYPE_FLOAT || dataType == DATA_TYPE_BOOL)
+        return 0;
+      break;
+    case DATA_TYPE_BOOL: // Incompatible with anything
+      if(dataType == DATA_TYPE_INT || dataType == DATA_TYPE_CHAR || dataType == DATA_TYPE_FLOAT)
+        return 0;
+      break;
+  }
+
+  return 1;
+}
+
+int convertSTtoDT(int symbolType) {
+  switch(symbolType)
+  {
+    case SYMBOL_LIT_INT:
+      return DATA_TYPE_INT;
+    case SYMBOL_LIT_FLOAT:
+      return DATA_TYPE_FLOAT;
+    case SYMBOL_LIT_CHAR:
+      return DATA_TYPE_CHAR;
+    default:
+      return 0;
+  }
+}
+
 int getDataType(AST* node) {
   int dataType = 0;
 
@@ -31,28 +72,11 @@ void validateInitVariable(AST* node) {
   AST *literal = node->son[1];
   int dataType = node->symbol->dataType;
 
-  switch (dataType)
-  {
-    case DATA_TYPE_INT:
-      if (literal->symbol->type != SYMBOL_LIT_INT) {
-        fprintf(stderr, "Semantic ERROR: Variable \"%s\" has wrong initialization value!\n", node->symbol->text);
-        ++errors;
-      }
-      break;
-    case DATA_TYPE_FLOAT:
-      if (literal->symbol->type != SYMBOL_LIT_FLOAT) {
-        fprintf(stderr, "Semantic ERROR: Variable \"%s\" has wrong initialization value!\n", node->symbol->text);
-        ++errors;
-      }
-      break;
-    case DATA_TYPE_CHAR:
-      if (literal->symbol->type != SYMBOL_LIT_CHAR) {
-        fprintf(stderr, "Semantic ERROR: Variable \"%s\" has wrong initialization value!\n", node->symbol->text);
-        ++errors;
-      }
-      break;
-    default:
-      break;
+  literal->symbol->dataType = convertSTtoDT(literal->symbol->type); // Ex: SYMBOL_LIT_INT -> DATA_TYPE_INT
+  
+  if (!isTypeCompatible(dataType, literal->symbol->dataType)) {
+    fprintf(stderr, "Semantic ERROR: Variable \"%s\" has wrong initialization value!\n", node->symbol->text);
+    ++errors;
   }
 }
 
@@ -68,7 +92,9 @@ int validateInitVectorValues(AST* node, int expectedType, int countValues) {
   literal = node->son[0];
   valueTail = node->son[1];
 
-  if (literal->symbol->type != expectedType) {
+  literal->symbol->dataType = convertSTtoDT(literal->symbol->type);
+
+  if (!isTypeCompatible(expectedType, literal->symbol->dataType)) {
     fprintf(stderr, "Semantic ERROR: Literal \"%s\" is of wrong type!\n", literal->symbol->text);
     ++errors;
   }
@@ -84,20 +110,7 @@ void validateInitVector(AST* node) {
   int countValues = 0;
   
   if(vectorValues) {
-    switch(dataType)
-    {
-      case DATA_TYPE_INT:
-        countValues = validateInitVectorValues(vectorValues, SYMBOL_LIT_INT, countValues);
-        break;
-      case DATA_TYPE_FLOAT:
-        countValues = validateInitVectorValues(vectorValues, SYMBOL_LIT_FLOAT, countValues);
-        break;
-      case DATA_TYPE_CHAR:
-        countValues = validateInitVectorValues(vectorValues, SYMBOL_LIT_CHAR, countValues);
-        break;
-      default:
-        break;
-    }
+    countValues = validateInitVectorValues(vectorValues, dataType, countValues);
 
     if (countValues != indexValue) {
       fprintf(stderr, "Semantic ERROR: Vector \"%s\" has wrong amount of initialization values!\n", node->symbol->text);

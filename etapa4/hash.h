@@ -25,6 +25,7 @@
 #define DATA_TYPE_INT 101
 #define DATA_TYPE_FLOAT 102
 #define DATA_TYPE_CHAR 103
+#define DATA_TYPE_BOOL 104
 
 typedef struct astnode AST;
 

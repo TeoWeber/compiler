@@ -10,11 +10,6 @@
 
 extern int errors;
 
-int getDataType(AST* node);
-void validateInitVariable(AST* node);
-int validateInitVectorValues(AST* node, int expectedType, int countValues);
-void validateInitVector(AST* node);
-void evaluateVarDeclared(AST* node);
 void evaluateDeclared(AST* node);
 
 #endif
