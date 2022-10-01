@@ -13,8 +13,9 @@
     extern int getLineNumber(void);
 
     void root(AST* node){
-        astPrint(node, 0);
+        // astPrint(node, 0);
         evaluateDeclared(node);
+        evaluateFunctions(node);
     }
 %}
 

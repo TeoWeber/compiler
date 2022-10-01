@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lex.yy.h"
 #include "ast.h"
 
 extern int yylex(void);
@@ -28,7 +27,7 @@ int main (int argc, char **argv) {
     FILE *file;
 
     if(argc < 2) {
-        fprintf(stderr, "Call: etapa input_file_name\n");
+        fprintf(stderr, "Call: ./etapa4 input_file_name\n");
         exit(1);
     }
 
@@ -41,17 +40,17 @@ int main (int argc, char **argv) {
     yyparse();
     // hashPrint();
 
-    if (argc >= 3)
-    {
-        file = fopen( argv[2], "w" );
-        astDecompiler(file, astCompiled);
-        fclose(file);
-    }
+    // if (argc >= 3)
+    // {
+    //     file = fopen( argv[2], "w" );
+    //     astDecompiler(file, astCompiled);
+    //     fclose(file);
+    // }
 
     fclose(yyin);
     yylex_destroy();
 
-    fprintf(stderr, "Program has %d lines.\n", getLineNumber());
+    fprintf(stderr, "\nProgram has %d lines.\n", getLineNumber());
     fprintf(stderr, "Compilation successful!\n");
     exit(0);
 }

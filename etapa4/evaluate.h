@@ -10,6 +10,8 @@
 
 extern int errors;
 
+int getExprDataType(AST* node);
 void evaluateDeclared(AST* node);
+void evaluateFunctions(AST* node);
 
 #endif
