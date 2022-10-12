@@ -5,8 +5,8 @@
 run: etapa5
 	./etapa5 source.txt
 
-etapa5: y.tab.o lex.yy.o main.o tools.o hash.o ast.o evaluate.o
-	gcc -o etapa5 obj/evaluate.o obj/ast.o obj/hash.o obj/tools.o obj/y.tab.o obj/lex.yy.o obj/main.o -ll
+etapa5: y.tab.o lex.yy.o main.o tools.o hash.o ast.o evaluate.o code.o
+	gcc -o etapa5 obj/evaluate.o obj/code.o obj/ast.o obj/hash.o obj/tools.o obj/y.tab.o obj/lex.yy.o obj/main.o -ll
 
 main.o: main.c obj/
 	gcc -c main.c -o obj/main.o
@@ -34,6 +34,9 @@ evaluate.o: evaluate.c obj/
 
 hash.o: hash.c obj/
 	gcc -c hash.c -o obj/hash.o
+
+code.o: code.c obj/
+	gcc -c code.c -o obj/code.o
 
 obj/:
 	mkdir obj
