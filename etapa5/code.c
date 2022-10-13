@@ -1,3 +1,6 @@
+// code.c - Compiladores 2022/1
+// Astélio José Weber Júnior - 283864
+// Wellington Nascente Hirsch - 287715
 #include "code.h"
 
 // IMPLEMENTATION
@@ -28,9 +31,9 @@ void tacPrint(TAC *tac) {
     return;
 
   // Comente para exibir os símbolos
-  if (tac->type == TAC_SYMBOL) {
-    return;
-  }
+  // if (tac->type == TAC_SYMBOL) {
+  //   return;
+  // }
   
   fprintf(stderr, "TAC(");
   switch(tac->type)

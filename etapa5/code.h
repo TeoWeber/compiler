@@ -1,4 +1,4 @@
-// ast.h - Compiladores 2022/1
+// code.h - Compiladores 2022/1
 // Astélio José Weber Júnior - 283864
 // Wellington Nascente Hirsch - 287715
 

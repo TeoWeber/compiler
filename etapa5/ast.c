@@ -5,7 +5,7 @@
 #include "ast.h"
   
 
-AST *astCreate(int type, HASH_NODE *symbol, AST* s0, AST* s1, AST* s2, AST* s3)
+AST *astCreate(int type, HASH_NODE *symbol, AST* s0, AST* s1, AST* s2, AST* s3, int lineNumber)
 {
   AST *newnode;
 
@@ -16,6 +16,7 @@ AST *astCreate(int type, HASH_NODE *symbol, AST* s0, AST* s1, AST* s2, AST* s3)
   newnode->son[1] = s1;
   newnode->son[2] = s2;
   newnode->son[3] = s3;
+  newnode->lineNumber = lineNumber;
 
   return newnode;
 }

@@ -96,18 +96,18 @@ int getVarDataType(AST *node) {
   return node->symbol->dataType;
 }
 
-void validateFuncCall(AST *paramList, AST *argList) {
+void validateFuncCall(AST *paramList, AST *argList, int lineNumber) {
   AST *argument;
   int argumentDataType;
 
   if (!paramList && argList) {
-    fprintf(stderr, "Semantic ERROR: Too many arguments on function call!\n");
+    fprintf(stderr, "Semantic ERROR: Too many arguments on function call at line %d.\n", lineNumber);
     ++errors;
     return;
   }
   
   if (paramList && !argList) {
-    fprintf(stderr, "Semantic ERROR: Too few arguments on function call!\n");
+    fprintf(stderr, "Semantic ERROR: Too few arguments on function call at line %d.\n", lineNumber);
     ++errors;
     return;
   }
@@ -119,11 +119,11 @@ void validateFuncCall(AST *paramList, AST *argList) {
   argumentDataType = getExprDataType(argument);
 
   if (!isTypeCompatible(paramList->symbol->dataType, argumentDataType)) {
-    fprintf(stderr, "Semantic ERROR: Argument \"%s\" has wrong type.\n", argument->symbol->text);
+    fprintf(stderr, "Semantic ERROR: Argument \"%s\" has wrong type at line %d.\n", argument->symbol->text, argument->lineNumber);
     ++errors;
   }
 
-  validateFuncCall(paramList->son[1], argList->son[1]);
+  validateFuncCall(paramList->son[1], argList->son[1], lineNumber);
 }
 
 int getExprDataType(AST *node) {
@@ -181,7 +181,7 @@ int getExprDataType(AST *node) {
     case AST_FUNCCALL:
       symbol = hashFind(node->symbol->text);
       dataType = symbol->dataType;
-      validateFuncCall(symbol->paramList, node->son[0]);
+      validateFuncCall(symbol->paramList, node->son[0], node->lineNumber);
       break;
   }
 
@@ -195,7 +195,7 @@ void validateInitVariable(AST* node) {
   literal->symbol->dataType = getSymbolDataType(literal); // Ex: SYMBOL_LIT_INT -> DATA_TYPE_INT
   
   if (!isTypeCompatible(dataType, literal->symbol->dataType)) {
-    fprintf(stderr, "Semantic ERROR: Variable \"%s\" has wrong initialization value!\n", node->symbol->text);
+    fprintf(stderr, "Semantic ERROR: Variable \"%s\" has wrong initialization value at line %d.\n", node->symbol->text, node->lineNumber);
     ++errors;
   }
 }
@@ -215,7 +215,7 @@ int validateInitVectorValues(AST* node, int expectedType, int countValues) {
   literal->symbol->dataType = getSymbolDataType(literal);
 
   if (!isTypeCompatible(expectedType, literal->symbol->dataType)) {
-    fprintf(stderr, "Semantic ERROR: Literal \"%s\" is of wrong type!\n", literal->symbol->text);
+    fprintf(stderr, "Semantic ERROR: Literal \"%s\" is of wrong type at line %d.\n", literal->symbol->text, literal->lineNumber);
     ++errors;
   }
 
@@ -233,7 +233,7 @@ void validateInitVector(AST* node) {
     countValues = validateInitVectorValues(vectorValues, dataType, countValues);
 
     if (countValues != indexValue) {
-      fprintf(stderr, "Semantic ERROR: Vector \"%s\" has wrong amount of initialization values!\n", node->symbol->text);
+      fprintf(stderr, "Semantic ERROR: Vector \"%s\" has wrong amount of initialization values at line %d.\n", node->symbol->text, node->lineNumber);
       ++errors;
     }
   }
@@ -246,7 +246,7 @@ void evaluateVarDeclared(AST* node) {
   int dataType;
 
   if(node->symbol->type != SYMBOL_IDENTIFIER) { // Already declared!
-    fprintf(stderr, "Semantic ERROR: Variable \"%s\" already declared!\n", node->symbol->text);
+    fprintf(stderr, "Semantic ERROR: Variable \"%s\" already declared at line %d.\n", node->symbol->text, node->lineNumber);
     ++errors;
   }
   else {
@@ -275,7 +275,7 @@ void evaluateParamDeclared(AST *node) {
   paramTail = node->son[1];
   
   if(node->symbol->type != SYMBOL_IDENTIFIER) { // Already declared!
-    fprintf(stderr, "Semantic ERROR: Parameter \"%s\" already declared!\n", node->symbol->text);
+    fprintf(stderr, "Semantic ERROR: Parameter \"%s\" already declared at line %d.\n", node->symbol->text, node->lineNumber);
     ++errors;
   }
 
@@ -287,7 +287,7 @@ void evaluateParamDeclared(AST *node) {
 
 int isCorrectSymbolType(AST *node, int expectedSymbolType) {
   if (node->symbol->type == SYMBOL_IDENTIFIER) { // Undeclared!
-    fprintf(stderr, "Semantic ERROR: Identifier \"%s\" not declared!\n", node->symbol->text);
+    fprintf(stderr, "Semantic ERROR: Identifier \"%s\" not declared at line %d.\n", node->symbol->text, node->lineNumber);
     ++errors;
     return 1;
   }
@@ -307,7 +307,7 @@ void evaluatePrint(AST *node) {
     dataType = getExprDataType(expression);
 
     if(!dataType) {
-      fprintf(stderr, "Semantic ERROR: Print command has incorrect expression.\n");
+      fprintf(stderr, "Semantic ERROR: Print command has incorrect expression at line %d.\n", expression->lineNumber);
       ++errors;
     }
     
@@ -339,7 +339,7 @@ void evaluateCommands(AST *node, int returnValue) {
   {
     case AST_ATTRIB:
       if(!isCorrectSymbolType(command, SYMBOL_VARIABLE)) {
-        fprintf(stderr, "Semantic ERROR: \"%s\" has incorrect use! Should be used as a variable.\n", command->symbol->text);
+        fprintf(stderr, "Semantic ERROR: \"%s\" has incorrect use! Should be used as a variable at line %d.\n", command->symbol->text, command->lineNumber);
         ++errors;
       }
 
@@ -348,18 +348,18 @@ void evaluateCommands(AST *node, int returnValue) {
 
       if(!isTypeCompatible(command->symbol->dataType, dataType)) {
         if(dataType && command->symbol->dataType) {
-          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incompatible type.\n", command->symbol->text);
+          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incompatible type at line %d.\n", command->symbol->text, command->lineNumber);
           ++errors;
         }
         else if (command->symbol->dataType) {
-          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incorrect expression.\n", command->symbol->text);
+          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incorrect expression at line %d.\n", command->symbol->text, command->lineNumber);
           ++errors;
         }
       }
       break;
     case AST_ATTRIBVEC:
       if(!isCorrectSymbolType(command, SYMBOL_VECTOR)) {
-        fprintf(stderr, "Semantic ERROR: \"%s\" has incorrect use! Should be used as a vector.\n", command->symbol->text);
+        fprintf(stderr, "Semantic ERROR: \"%s\" has incorrect use! Should be used as a vector at line %d.\n", command->symbol->text, command->lineNumber);
         ++errors;
       }
 
@@ -368,11 +368,11 @@ void evaluateCommands(AST *node, int returnValue) {
 
       if(!isTypeCompatible(DATA_TYPE_INT, indexDataType)) {
         if (indexDataType) {
-          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incompatible index type.\n", command->symbol->text);
+          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incompatible index type at line %d.\n", command->symbol->text, command->lineNumber);
           ++errors;
         }
         else {
-          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incorrect index expression.\n", command->symbol->text);
+          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incorrect index expression at line %d.\n", command->symbol->text, command->lineNumber);
           ++errors;
         }
       }
@@ -382,11 +382,11 @@ void evaluateCommands(AST *node, int returnValue) {
 
       if(!isTypeCompatible(command->symbol->dataType, dataType)) {
         if (dataType && command->symbol->dataType) {
-          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incompatible type.\n", command->symbol->text);
+          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incompatible type at line %d.\n", command->symbol->text, command->lineNumber);
           ++errors;
         }
         else if (command->symbol->dataType) {
-          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incorrect expression.\n", command->symbol->text);
+          fprintf(stderr, "Semantic ERROR: \"%s\" is being attributed with incorrect expression at line %d.\n", command->symbol->text, command->lineNumber);
           ++errors;
         }
       }
@@ -397,11 +397,11 @@ void evaluateCommands(AST *node, int returnValue) {
 
       if(!isTypeCompatible(DATA_TYPE_INT, indexDataType)) {
         if (indexDataType) {
-          fprintf(stderr, "Semantic ERROR: \"%s\" is being used with incompatible index type.\n", command->symbol->text);
+          fprintf(stderr, "Semantic ERROR: \"%s\" is being used with incompatible index type at line %d.\n", command->symbol->text, command->lineNumber);
           ++errors;
         }
         else {
-          fprintf(stderr, "Semantic ERROR: \"%s\" is being used with incorrect index expression.\n", command->symbol->text);
+          fprintf(stderr, "Semantic ERROR: \"%s\" is being used with incorrect index expression at line %d.\n", command->symbol->text, command->lineNumber);
           ++errors;
         }
       }
@@ -415,11 +415,11 @@ void evaluateCommands(AST *node, int returnValue) {
 
       if (!isTypeCompatible(returnValue, dataType)) {
         if (dataType) {
-          fprintf(stderr, "Semantic ERROR: Return value is incompatible with function declaration.\n");
+          fprintf(stderr, "Semantic ERROR: Return value is incompatible with function declaration at line %d.\n", expression->lineNumber);
           ++errors;
         }
         else {
-          fprintf(stderr, "Semantic ERROR: Return value has incorrect expression.\n");
+          fprintf(stderr, "Semantic ERROR: Return value has incorrect expression at line %d.\n", expression->lineNumber);
           ++errors;
         }
       }
@@ -430,11 +430,11 @@ void evaluateCommands(AST *node, int returnValue) {
 
       if (!isTypeCompatible(dataType, DATA_TYPE_BOOL)) {
         if (dataType) {
-          fprintf(stderr, "Semantic ERROR: Conditional expression should result in a boolean.\n");
+          fprintf(stderr, "Semantic ERROR: Conditional expression should result in a boolean at line %d.\n", expression->lineNumber);
           ++errors;
         }
         else {
-          fprintf(stderr, "Semantic ERROR: Incorrect conditional expression.\n");
+          fprintf(stderr, "Semantic ERROR: Incorrect conditional expression at line %d.\n", expression->lineNumber);
           ++errors;
         }
       }
@@ -448,11 +448,11 @@ void evaluateCommands(AST *node, int returnValue) {
 
       if (!isTypeCompatible(dataType, DATA_TYPE_BOOL)) {
         if (dataType) {
-          fprintf(stderr, "Semantic ERROR: Conditional expression should result in a boolean.\n");
+          fprintf(stderr, "Semantic ERROR: Conditional expression should result in a boolean at line %d.\n", expression->lineNumber);
           ++errors;
         }
         else {
-          fprintf(stderr, "Semantic ERROR: Incorrect conditional expression.\n");
+          fprintf(stderr, "Semantic ERROR: Incorrect conditional expression at line %d.\n", expression->lineNumber);
           ++errors;
         }
       }
@@ -469,11 +469,11 @@ void evaluateCommands(AST *node, int returnValue) {
 
       if (!isTypeCompatible(dataType, DATA_TYPE_BOOL)) {
         if (dataType) {
-          fprintf(stderr, "Semantic ERROR: Conditional expression should result in a boolean.\n");
+          fprintf(stderr, "Semantic ERROR: Conditional expression should result in a boolean at line %d.\n", expression->lineNumber);
           ++errors;
         }
         else {
-          fprintf(stderr, "Semantic ERROR: Incorrect conditional expression.\n");
+          fprintf(stderr, "Semantic ERROR: Incorrect conditional expression at line %d.\n", expression->lineNumber);
           ++errors;
         }
       }
@@ -497,7 +497,7 @@ void evaluateFuncDeclared(AST *node) {
   int dataType;
 
   if(node->symbol->type != SYMBOL_IDENTIFIER) { // Already declared!
-    fprintf(stderr, "Semantic ERROR: Function \"%s\" already declared!\n", node->symbol->text);
+    fprintf(stderr, "Semantic ERROR: Function \"%s\" already declared at line %d.\n", node->symbol->text, node->lineNumber);
     ++errors;
   }
 

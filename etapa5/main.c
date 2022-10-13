@@ -14,6 +14,8 @@ extern int yyparse();
 extern FILE *yyin;
 extern char *yytext;
 
+extern int errors;
+
 // TOOLS Functions
 int getLineNumber(void);
 int isRunning(void);
@@ -27,7 +29,7 @@ int main (int argc, char **argv) {
     FILE *file;
 
     if(argc < 2) {
-        fprintf(stderr, "Call: ./etapa5 input_file_name\n");
+        fprintf(stderr, "Call: ./etapa4 input_file_name\n");
         exit(1);
     }
 
@@ -38,7 +40,7 @@ int main (int argc, char **argv) {
 
     initMe();
     yyparse();
-    hashPrint();
+    // hashPrint();
 
     // if (argc >= 3)
     // {
@@ -49,6 +51,11 @@ int main (int argc, char **argv) {
 
     fclose(yyin);
     yylex_destroy();
+
+    if (errors > 0) {
+        fprintf(stderr, "%d errors detected!\n", errors);
+        exit(4);
+    }
 
     fprintf(stderr, "\nProgram has %d lines.\n", getLineNumber());
     fprintf(stderr, "Compilation successful!\n");
