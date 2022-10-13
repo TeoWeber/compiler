@@ -14,7 +14,7 @@ extern int yyparse();
 extern FILE *yyin;
 extern char *yytext;
 
-extern int *errors;
+extern int errors;
 
 // TOOLS Functions
 int getLineNumber(void);
@@ -52,8 +52,10 @@ int main (int argc, char **argv) {
     fclose(yyin);
     yylex_destroy();
 
-    if (errors > 0)
+    if (errors > 0) {
+        fprintf(stderr, "%d errors detected!\n", errors);
         exit(4);
+    }
 
     fprintf(stderr, "\nProgram has %d lines.\n", getLineNumber());
     fprintf(stderr, "Compilation successful!\n");
