@@ -62,3 +62,19 @@ void hashPrint(void) {
     for (node=Hash[i]; node; node = node->next)
       printf("Hash[%d] has %s from type id %d\n", i, node->text, node->type);
 }
+
+HASH_NODE *makeTemp(void) {
+  static int serial = 0;
+  char buffer[256] = "";
+
+  sprintf(buffer, "tEo_mY_tEmP_wElL%d", serial++);
+  return hashInsert(SYMBOL_VARIABLE, buffer);
+}
+
+HASH_NODE *makeLabel(void) {
+  static int serial = 0;
+  char buffer[256] = "";
+
+  sprintf(buffer, "tEo_mY_lAbEl_wElL%d", serial++);
+  return hashInsert(SYMBOL_LABEL, buffer);
+}

@@ -20,6 +20,7 @@
 #define SYMBOL_VARIABLE 6
 #define SYMBOL_VECTOR 7
 #define SYMBOL_FUNCTION 8
+#define SYMBOL_LABEL 9
 
 #define DATA_TYPE_INT 101
 #define DATA_TYPE_FLOAT 102
@@ -42,5 +43,7 @@ int hashAddress(char *text);
 HASH_NODE *hashFind(char *text);
 HASH_NODE *hashInsert(int type, char *text);
 void hashPrint(void);
+HASH_NODE *makeTemp(void);
+HASH_NODE *makeLabel(void);
 
 #endif
