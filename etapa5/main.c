@@ -29,7 +29,7 @@ int main (int argc, char **argv) {
     FILE *file;
 
     if(argc < 2) {
-        fprintf(stderr, "Call: ./etapa4 input_file_name\n");
+        fprintf(stderr, "Call: ./etapa5 input_file_name\n");
         exit(1);
     }
 

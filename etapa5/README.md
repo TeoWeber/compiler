@@ -1,5 +1,5 @@
 # Compilador
-Etapa 4 do trabalho semestral da cadeira de Compiladores na UFRGS 
+Etapa 5 do trabalho semestral da cadeira de Compiladores na UFRGS 
 2022/1
 ## Grupo:
 283864 - Astélio José Weber Júnior <br />
