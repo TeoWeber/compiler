@@ -31,9 +31,9 @@ void tacPrint(TAC *tac) {
     return;
 
   // Comente para exibir os símbolos
-  // if (tac->type == TAC_SYMBOL) {
-  //   return;
-  // }
+  if (tac->type == TAC_SYMBOL) {
+    return;
+  }
   
   fprintf(stderr, "TAC(");
   switch(tac->type)
